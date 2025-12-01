@@ -75,7 +75,8 @@ jobs:
             elif .key == "login_password_superadmin" then .value = env.LOGIN_PASSWORD_SUPERADMIN
 
             else . end
-          )' "postman:Git_DevEnv_CI.postman_environment.json > env.patched.json" \
+          )' 'postman:Git_DevEnv_CI.postman_environment.json' > env.patched.json
+
     
 
       # 5) Run login collection first
