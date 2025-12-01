@@ -75,12 +75,13 @@ jobs:
             elif .key == "login_password_superadmin" then .value = env.LOGIN_PASSWORD_SUPERADMIN
 
             else . end
-          )' "postman/Git_DevEnv_CI.postman_environment.json > env.patched.json"
+          )' "postman:Git_DevEnv_CI.postman_environment.json > env.patched.json"
+    
 
       # 5) Run login collection first
       - name: Run login collection
         run: |
-          newman run "postman/Git_WT_Login_Token.postman_collection.json" \
+          newman run "postman:Git_WT_Login_Token.postman_collection.json" \
             -e env.patched.json \
             --reporters cli \
             --export-globals globals.after-login.json
@@ -88,7 +89,7 @@ jobs:
       # 6) Run main tests
       - name: Run DroneDisplayName tests
         run: |
-          newman run "postman/Git_Drone display name.postman_collection.json" \
+          newman run "postman:Git_Drone display name.postman_collection.json" \
             -e env.patched.json \
             --globals globals.after-login.json \
             --reporters cli
