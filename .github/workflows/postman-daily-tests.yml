@@ -88,7 +88,7 @@ jobs:
       # 6) Run main tests
       - name: Run DroneDisplayName tests
         run: |
-          newman run postman/Git_Drone display name.postman_collection.json \
+          newman run "postman/Git_Drone display name.postman_collection.json" \
             -e env.patched.json \
             --globals globals.after-login.json \
             --reporters cli
