@@ -1,0 +1,320 @@
+{
+	"info": {
+		"_postman_id": "1c7c679e-ffe9-4fec-b1c7-12cd6b7f4237",
+		"name": "WT_Login_Token",
+		"description": "This helps to login to the WatchTower and Give as a token and set the token as the globle veriable.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49532129",
+		"_collection_link": "https://paladin-3098.postman.co/workspace/ae39c344-df2d-44b0-89e2-3efb5c8705e5/collection/49532129-1c7c679e-ffe9-4fec-b1c7-12cd6b7f4237?action=share&source=collection_link&creator=49532129"
+	},
+	"item": [
+		{
+			"name": "Pilot",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_Pilot\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email:\"{{login_email_pilot}}\"\n        password: \"{{login_password_pilot}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Owner",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_Owner\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_Owner}}\"\n        password: \"{{login_password_Owner}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "csuite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_Csuite\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_csuite}}\"\n        password: \"{{login_password_csuite}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "executiveadmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_executiveadmin\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_executiveadmin}}\"\n        password: \"{{login_password_executiveadmin}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_admin\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_admin}}\"\n        password: \"{{login_password_admin}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Spectator",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_Spectator\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_spectator}}\"\n        password: \"{{login_password_spectator}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "WatchTower_loginsuperadmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Extract the token from the GraphQL response",
+							"let jsonData = pm.response.json();",
+							"let token = jsonData.data.login.token;",
+							"",
+							"// Save token in the active environment (dev/prod)",
+							"pm.globals.set(\"Token_Superadmin1\", token);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Login {\n    login(\n        email: \"{{login_email_superadmin}}\"\n        password: \"{{login_password_superadmin}}\"\n    ) {\n        ... on LoginSuccess {\n            token\n        }\n    }\n}\n",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
