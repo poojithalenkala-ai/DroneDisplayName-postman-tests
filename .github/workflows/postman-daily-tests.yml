@@ -1,0 +1,94 @@
+name: Daily Postman tests
+
+on:
+  # Runs every day at 03:00 UTC (~9 PM US Central)
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:  # allow manual runs
+
+jobs:
+  postman-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Checkout repo files
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Setup Node.js for Newman
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # 3) Install Newman and jq
+      - name: Install Newman and jq
+        run: |
+          npm install -g newman
+          sudo apt-get update && sudo apt-get install -y jq
+
+      # 4) Build patched env with secrets
+      - name: Prepare Postman environment
+        env:
+          LOGIN_EMAIL_PILOT: ${{ secrets.LOGIN_EMAIL_PILOT }}
+          LOGIN_PASSWORD_PILOT: ${{ secrets.LOGIN_PASSWORD_PILOT }}
+
+          LOGIN_EMAIL_OWNER: ${{ secrets.LOGIN_EMAIL_OWNER }}
+          LOGIN_PASSWORD_OWNER: ${{ secrets.LOGIN_PASSWORD_OWNER }}
+
+          LOGIN_EMAIL_CSUITE: ${{ secrets.LOGIN_EMAIL_CSUITE }}
+          LOGIN_PASSWORD_CSUITE: ${{ secrets.LOGIN_PASSWORD_CSUITE }}
+
+          LOGIN_EMAIL_EXECUTIVEADMIN: ${{ secrets.LOGIN_EMAIL_EXECUTIVEADMIN }}
+          LOGIN_PASSWORD_EXECUTIVEADMIN: ${{ secrets.LOGIN_PASSWORD_EXECUTIVEADMIN }}
+
+          LOGIN_EMAIL_ADMIN: ${{ secrets.LOGIN_EMAIL_ADMIN }}
+          LOGIN_PASSWORD_ADMIN: ${{ secrets.LOGIN_PASSWORD_ADMIN }}
+
+          LOGIN_EMAIL_SPECTATOR: ${{ secrets.LOGIN_EMAIL_SPECTATOR }}
+          LOGIN_PASSWORD_SPECTATOR: ${{ secrets.LOGIN_PASSWORD_SPECTATOR }}
+
+          LOGIN_EMAIL_SUPERADMIN: ${{ secrets.LOGIN_EMAIL_SUPERADMIN }}
+          LOGIN_PASSWORD_SUPERADMIN: ${{ secrets.LOGIN_PASSWORD_SUPERADMIN }}
+
+        run: |
+          jq '.values |= map(
+            if .key == "login_email_pilot" then .value = env.LOGIN_EMAIL_PILOT
+            elif .key == "login_password_pilot" then .value = env.LOGIN_PASSWORD_PILOT
+
+            elif .key == "login_email_Owner" then .value = env.LOGIN_EMAIL_OWNER
+            elif .key == "login_password_Owner" then .value = env.LOGIN_PASSWORD_OWNER
+
+            elif .key == "login_email_csuite" then .value = env.LOGIN_EMAIL_CSUITE
+            elif .key == "login_password_csuite" then .value = env.LOGIN_PASSWORD_CSUITE
+
+            elif .key == "login_email_executiveadmin" then .value = env.LOGIN_EMAIL_EXECUTIVEADMIN
+            elif .key == "login_password_executiveadmin" then .value = env.LOGIN_PASSWORD_EXECUTIVEADMIN
+
+            elif .key == "login_email_admin" then .value = env.LOGIN_EMAIL_ADMIN
+            elif .key == "login_password_admin" then .value = env.LOGIN_PASSWORD_ADMIN
+
+            elif .key == "login_email_spectator" then .value = env.LOGIN_EMAIL_SPECTATOR
+            elif .key == "login_password_spectator" then .value = env.LOGIN_PASSWORD_SPECTATOR
+
+            elif .key == "login_email_superadmin" then .value = env.LOGIN_EMAIL_SUPERADMIN
+            elif .key == "login_password_superadmin" then .value = env.LOGIN_PASSWORD_SUPERADMIN
+
+            else . end
+          )' postman/Git_DevEnv_CI.postman_environment.json > env.patched.json
+
+      # 5) Run login collection first
+      - name: Run login collection
+        run: |
+          newman run postman/Git_WT_Login_Token.postman_collection.json \
+            -e env.patched.json \
+            --reporters cli \
+            --export-globals globals.after-login.json
+
+      # 6) Run main tests
+      - name: Run DroneDisplayName tests
+        run: |
+          newman run postman/Git_Drone display name.postman_collection.json \
+            -e env.patched.json \
+            --globals globals.after-login.json \
+            --reporters cli
