@@ -77,12 +77,10 @@ jobs:
             else . end
           )' 'postman:Git_DevEnv_CI.postman_environment.json' > env.patched.json
 
-    
-
       # 5) Run login collection first
       - name: Run login collection
         run: |
-          newman run "postman:Git_WT_Login_Token.postman_collection.json" \
+          newman run 'postman:Git_WT_Login_Token.postman_collection.json' \
             -e env.patched.json \
             --reporters cli \
             --export-globals globals.after-login.json
@@ -90,7 +88,21 @@ jobs:
       # 6) Run main tests
       - name: Run DroneDisplayName tests
         run: |
-          newman run "postman:Git_Drone display name.postman_collection.json" \
+          newman run 'postman:Git_Drone display name.postman_collection.json' \
             -e env.patched.json \
             --globals globals.after-login.json \
             --reporters cli
+
+      # 7) Send Slack notification
+      - name: Post results to Slack
+        if: always()   # send even if tests fail
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": ":rocket: *Daily Postman Tests Completed*\n\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Run:* ${{ github.run_number }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "username": "Postman CI Bot",
+              "icon_emoji": ":robot_face:"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
