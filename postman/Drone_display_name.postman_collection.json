@@ -1,0 +1,3910 @@
+{
+  "info": {
+    "_postman_id": "22b4ae85-bc85-4e95-b4fb-355e1e826da6",
+    "name": "Drone display name",
+    "description": "Added a graphQL mutation so the drone display name can be changed by the user. The field is optional and can be left blank. This field can be updated and changed back to blank (null) if needed.\n\n**End Point:**\n\n[Ariadne GraphQL](https://api.paladindrones.dev/watchtower/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49532129",
+    "_collection_link": "https://go.postman.co/collection/49532129-22b4ae85-bc85-4e95-b4fb-355e1e826da6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Owner",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 1️⃣ Status code: parsing errors are typically 400 (keep strict if your API is consistent)",
+                  "pm.test(\"1. HTTP status is 400 for GraphQL parse error\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ Response must contain non-empty errors array",
+                  "pm.test(\"2. errors array exists and is not empty\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ First error message indicates GraphQL syntax/parse failure",
+                  "pm.test(\"3. error message indicates syntax/invalid number\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(body.errors[0].message).to.match(/syntax error|invalid number/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes locations with line & column",
+                  "pm.test(\"4. error includes line and column location\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(body.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data returned when parsing fails",
+                  "pm.test(\"5. no data is returned on parse error\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: malformed GraphQL requests return 400 in this service",
+                  "pm.test(\"1. HTTP status is 400 (Bad Request)\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL errors array exists and is not empty",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(res).to.be.an(\"object\");",
+                  "  pm.expect(res.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ Error message indicates GraphQL syntax/parsing failure",
+                  "pm.test(\"3. Error message indicates syntax error\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(res.errors[0].message).to.match(/Syntax Error/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes location info (parser-level failure shape)",
+                  "pm.test(\"4. Error includes location (line/column)\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(res.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data should be returned when syntax fails",
+                  "pm.test(\"5. No data returned on syntax error\", () => {",
+                  "  pm.expect(res).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: invalid input must return 400",
+                  "pm.test(\"1. HTTP status is 400 for invalid input\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL must report validation errors",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"errors\");",
+                  "  pm.expect(json.errors).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "const err = json.errors[0];",
+                  "",
+                  "// 3️⃣ Error message clearly indicates invalid Int value",
+                  "pm.test(\"3. Error message indicates invalid Int\", () => {",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message).to.include(\"Int cannot represent\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Error contains parsing metadata (locations)",
+                  "pm.test(\"4. Error contains locations metadata\", () => {",
+                  "  pm.expect(err).to.have.property(\"locations\");",
+                  "  pm.expect(err.locations).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "// 5️⃣ No mutation data should be returned on validation failure",
+                  "pm.test(\"5. No data returned on validation failure\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "const result = body?.data?.droneDisplayNameSet;",
+                  "",
+                  "// 1️⃣ Transport layer success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL contract is intact",
+                  "pm.test(\"2. droneDisplayNameSet mutation returned data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "  pm.expect(result).to.exist;",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation response contains error fields",
+                  "pm.test(\"3. errorID and errorMessage are present\", () => {",
+                  "  pm.expect(result).to.have.property(\"errorID\");",
+                  "  pm.expect(result).to.have.property(\"errorMessage\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business success: no error code returned",
+                  "pm.test(\"4. errorID is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business success: no error message returned",
+                  "pm.test(\"5. errorMessage is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const result = json?.data?.droneDisplayNameSet;",
+                  "",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"2. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNameSet\").that.is.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"3. errorID is resource_not_allowed\", () => {",
+                  "  pm.expect(result.errorID).to.eql(\"resource_not_allowed\");",
+                  "});",
+                  "",
+                  "pm.test(\"4. errorMessage is exact expected text\", () => {",
+                  "  pm.expect(result.errorMessage)",
+                  "    .to.eql(\"You do not have access to manage this resource.\");",
+                  "});",
+                  "",
+                  "pm.test(\"5. No top-level GraphQL errors array\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_Owner}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 1️⃣ Status code: parsing errors are typically 400 (keep strict if your API is consistent)",
+                  "pm.test(\"1. HTTP status is 400 for GraphQL parse error\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ Response must contain non-empty errors array",
+                  "pm.test(\"2. errors array exists and is not empty\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ First error message indicates GraphQL syntax/parse failure",
+                  "pm.test(\"3. error message indicates syntax/invalid number\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(body.errors[0].message).to.match(/syntax error|invalid number/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes locations with line & column",
+                  "pm.test(\"4. error includes line and column location\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(body.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data returned when parsing fails",
+                  "pm.test(\"5. no data is returned on parse error\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: malformed GraphQL requests return 400 in this service",
+                  "pm.test(\"1. HTTP status is 400 (Bad Request)\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL errors array exists and is not empty",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(res).to.be.an(\"object\");",
+                  "  pm.expect(res.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ Error message indicates GraphQL syntax/parsing failure",
+                  "pm.test(\"3. Error message indicates syntax error\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(res.errors[0].message).to.match(/Syntax Error/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes location info (parser-level failure shape)",
+                  "pm.test(\"4. Error includes location (line/column)\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(res.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data should be returned when syntax fails",
+                  "pm.test(\"5. No data returned on syntax error\", () => {",
+                  "  pm.expect(res).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: invalid input must return 400",
+                  "pm.test(\"1. HTTP status is 400 for invalid input\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL must report validation errors",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"errors\");",
+                  "  pm.expect(json.errors).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "const err = json.errors[0];",
+                  "",
+                  "// 3️⃣ Error message clearly indicates invalid Int value",
+                  "pm.test(\"3. Error message indicates invalid Int\", () => {",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message).to.include(\"Int cannot represent\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Error contains parsing metadata (locations)",
+                  "pm.test(\"4. Error contains locations metadata\", () => {",
+                  "  pm.expect(err).to.have.property(\"locations\");",
+                  "  pm.expect(err.locations).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "// 5️⃣ No mutation data should be returned on validation failure",
+                  "pm.test(\"5. No data returned on validation failure\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "const result = body?.data?.droneDisplayNameSet;",
+                  "",
+                  "// 1️⃣ Transport layer success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL contract is intact",
+                  "pm.test(\"2. droneDisplayNameSet mutation returned data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "  pm.expect(result).to.exist;",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation response contains error fields",
+                  "pm.test(\"3. errorID and errorMessage are present\", () => {",
+                  "  pm.expect(result).to.have.property(\"errorID\");",
+                  "  pm.expect(result).to.have.property(\"errorMessage\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business success: no error code returned",
+                  "pm.test(\"4. errorID is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business success: no error message returned",
+                  "pm.test(\"5. errorMessage is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"!@#$%^&*(\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const result = json?.data?.droneDisplayNameSet;",
+                  "",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"2. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNameSet\").that.is.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"3. errorID is resource_not_allowed\", () => {",
+                  "  pm.expect(result.errorID).to.eql(\"resource_not_allowed\");",
+                  "});",
+                  "",
+                  "pm.test(\"4. errorMessage is exact expected text\", () => {",
+                  "  pm.expect(result.errorMessage)",
+                  "    .to.eql(\"You do not have access to manage this resource.\");",
+                  "});",
+                  "",
+                  "pm.test(\"5. No top-level GraphQL errors array\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_admin}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Superadmin",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 1️⃣ Status code: parsing errors are typically 400 (keep strict if your API is consistent)",
+                  "pm.test(\"1. HTTP status is 400 for GraphQL parse error\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ Response must contain non-empty errors array",
+                  "pm.test(\"2. errors array exists and is not empty\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ First error message indicates GraphQL syntax/parse failure",
+                  "pm.test(\"3. error message indicates syntax/invalid number\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(body.errors[0].message).to.match(/syntax error|invalid number/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes locations with line & column",
+                  "pm.test(\"4. error includes line and column location\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(body.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data returned when parsing fails",
+                  "pm.test(\"5. no data is returned on parse error\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: malformed GraphQL requests return 400 in this service",
+                  "pm.test(\"1. HTTP status is 400 (Bad Request)\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL errors array exists and is not empty",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(res).to.be.an(\"object\");",
+                  "  pm.expect(res.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ Error message indicates GraphQL syntax/parsing failure",
+                  "pm.test(\"3. Error message indicates syntax error\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(res.errors[0].message).to.match(/Syntax Error/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes location info (parser-level failure shape)",
+                  "pm.test(\"4. Error includes location (line/column)\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(res.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data should be returned when syntax fails",
+                  "pm.test(\"5. No data returned on syntax error\", () => {",
+                  "  pm.expect(res).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: invalid input must return 400",
+                  "pm.test(\"1. HTTP status is 400 for invalid input\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL must report validation errors",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"errors\");",
+                  "  pm.expect(json.errors).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "const err = json.errors[0];",
+                  "",
+                  "// 3️⃣ Error message clearly indicates invalid Int value",
+                  "pm.test(\"3. Error message indicates invalid Int\", () => {",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message).to.include(\"Int cannot represent\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Error contains parsing metadata (locations)",
+                  "pm.test(\"4. Error contains locations metadata\", () => {",
+                  "  pm.expect(err).to.have.property(\"locations\");",
+                  "  pm.expect(err.locations).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "// 5️⃣ No mutation data should be returned on validation failure",
+                  "pm.test(\"5. No data returned on validation failure\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "const result = body?.data?.droneDisplayNameSet;",
+                  "",
+                  "// 1️⃣ Transport layer success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL contract is intact",
+                  "pm.test(\"2. droneDisplayNameSet mutation returned data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "  pm.expect(result).to.exist;",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation response contains error fields",
+                  "pm.test(\"3. errorID and errorMessage are present\", () => {",
+                  "  pm.expect(result).to.have.property(\"errorID\");",
+                  "  pm.expect(result).to.have.property(\"errorMessage\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business success: no error code returned",
+                  "pm.test(\"4. errorID is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business success: no error message returned",
+                  "pm.test(\"5. errorMessage is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const result = json?.data?.droneDisplayNameSet;",
+                  "",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"2. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNameSet\").that.is.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"3. errorID is resource_not_allowed\", () => {",
+                  "  pm.expect(result.errorID).to.eql(\"resource_not_allowed\");",
+                  "});",
+                  "",
+                  "pm.test(\"4. errorMessage is exact expected text\", () => {",
+                  "  pm.expect(result.errorMessage)",
+                  "    .to.eql(\"You do not have access to manage this resource.\");",
+                  "});",
+                  "",
+                  "pm.test(\"5. No top-level GraphQL errors array\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_Superadmin1}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Executiveadmin",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 1️⃣ Status code: parsing errors are typically 400 (keep strict if your API is consistent)",
+                  "pm.test(\"1. HTTP status is 400 for GraphQL parse error\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ Response must contain non-empty errors array",
+                  "pm.test(\"2. errors array exists and is not empty\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ First error message indicates GraphQL syntax/parse failure",
+                  "pm.test(\"3. error message indicates syntax/invalid number\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(body.errors[0].message).to.match(/syntax error|invalid number/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes locations with line & column",
+                  "pm.test(\"4. error includes line and column location\", () => {",
+                  "  pm.expect(body.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(body.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(body.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data returned when parsing fails",
+                  "pm.test(\"5. no data is returned on parse error\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: malformed GraphQL requests return 400 in this service",
+                  "pm.test(\"1. HTTP status is 400 (Bad Request)\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL errors array exists and is not empty",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(res).to.be.an(\"object\");",
+                  "  pm.expect(res.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3️⃣ Error message indicates GraphQL syntax/parsing failure",
+                  "pm.test(\"3. Error message indicates syntax error\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"message\");",
+                  "  pm.expect(res.errors[0].message).to.match(/Syntax Error/i);",
+                  "});",
+                  "",
+                  "// 4️⃣ Error includes location info (parser-level failure shape)",
+                  "pm.test(\"4. Error includes location (line/column)\", () => {",
+                  "  pm.expect(res.errors[0]).to.have.property(\"locations\");",
+                  "  pm.expect(res.errors[0].locations).to.be.an(\"array\").that.is.not.empty;",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"line\");",
+                  "  pm.expect(res.errors[0].locations[0]).to.have.property(\"column\");",
+                  "});",
+                  "",
+                  "// 5️⃣ No data should be returned when syntax fails",
+                  "pm.test(\"5. No data returned on syntax error\", () => {",
+                  "  pm.expect(res).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Contract: invalid input must return 400",
+                  "pm.test(\"1. HTTP status is 400 for invalid input\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL must report validation errors",
+                  "pm.test(\"2. GraphQL errors array exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"errors\");",
+                  "  pm.expect(json.errors).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "const err = json.errors[0];",
+                  "",
+                  "// 3️⃣ Error message clearly indicates invalid Int value",
+                  "pm.test(\"3. Error message indicates invalid Int\", () => {",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message).to.include(\"Int cannot represent\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Error contains parsing metadata (locations)",
+                  "pm.test(\"4. Error contains locations metadata\", () => {",
+                  "  pm.expect(err).to.have.property(\"locations\");",
+                  "  pm.expect(err.locations).to.be.an(\"array\").and.not.empty;",
+                  "});",
+                  "",
+                  "// 5️⃣ No mutation data should be returned on validation failure",
+                  "pm.test(\"5. No data returned on validation failure\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"data\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const body = pm.response.json();",
+                  "const result = body?.data?.droneDisplayNameSet;",
+                  "",
+                  "// 1️⃣ Transport layer success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL contract is intact",
+                  "pm.test(\"2. droneDisplayNameSet mutation returned data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "  pm.expect(result).to.exist;",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation response contains error fields",
+                  "pm.test(\"3. errorID and errorMessage are present\", () => {",
+                  "  pm.expect(result).to.have.property(\"errorID\");",
+                  "  pm.expect(result).to.have.property(\"errorMessage\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business success: no error code returned",
+                  "pm.test(\"4. errorID is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business success: no error message returned",
+                  "pm.test(\"5. errorMessage is null (update accepted)\", () => {",
+                  "  pm.expect(result.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const result = json?.data?.droneDisplayNameSet;",
+                  "",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"2. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNameSet\").that.is.an(\"object\");",
+                  "});",
+                  "",
+                  "pm.test(\"3. errorID is resource_not_allowed\", () => {",
+                  "  pm.expect(result.errorID).to.eql(\"resource_not_allowed\");",
+                  "});",
+                  "",
+                  "pm.test(\"4. errorMessage is exact expected text\", () => {",
+                  "  pm.expect(result.errorMessage)",
+                  "    .to.eql(\"You do not have access to manage this resource.\");",
+                  "});",
+                  "",
+                  "pm.test(\"5. No top-level GraphQL errors array\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "",
+                  "// 1️⃣ Transport success",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL envelope exists",
+                  "pm.test(\"2. GraphQL data exists\", () => {",
+                  "  pm.expect(json).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Mutation payload exists",
+                  "pm.test(\"3. data.droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(json.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Business rule: no error ID",
+                  "pm.test(\"4. errorID is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorID).to.eql(null);",
+                  "});",
+                  "",
+                  "// 5️⃣ Business rule: no error message",
+                  "pm.test(\"5. errorMessage is null\", () => {",
+                  "  pm.expect(json.data.droneDisplayNameSet.errorMessage).to.eql(null);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_executiveadmin}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Csuite",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse response once",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// 1) Status code is 200 (request handled, even though not allowed)",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2) GraphQL response has data and droneDisplayNameSet object",
+                  "pm.test(\"Response has data.droneDisplayNameSet\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"data\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 3) Unauthorized action is represented by errorID = 'action_not_allowed'",
+                  "pm.test(\"errorID indicates action is not allowed\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorID\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorID).to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 4) errorMessage matches expected message",
+                  "pm.test(\"errorMessage explains lack of access\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorMessage\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorMessage).to.eql(",
+                  "        \"You do not have access to execute this action.\"",
+                  "    );",
+                  "});",
+                  "",
+                  "// 5) No unexpected top-level GraphQL errors field",
+                  "pm.test(\"No top-level GraphQL errors array\", function () {",
+                  "    pm.expect(jsonData).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "",
+                  "/**",
+                  " * 1️⃣ Invalid request rejected (client error)",
+                  " */",
+                  "pm.test(\"1. Returns HTTP 400\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "/**",
+                  " * 2️⃣ Response is valid JSON object",
+                  " */",
+                  "pm.test(\"2. Response JSON is an object\", () => {",
+                  "  pm.expect(body).to.be.an(\"object\");",
+                  "});",
+                  "",
+                  "/**",
+                  " * 3️⃣ GraphQL error contract: errors array exists and is non-empty",
+                  " */",
+                  "pm.test(\"3. GraphQL errors array is present\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "/**",
+                  " * 4️⃣ No success payload leaks through",
+                  " */",
+                  "pm.test(\"4. No data returned\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  "",
+                  "/**",
+                  " * 5️⃣ Error meaning matches the failure class (syntax/invalid number)",
+                  " */",
+                  "pm.test(\"5. Error indicates invalid numeric literal\", () => {",
+                  "  const msg = body.errors[0].message;",
+                  "  pm.expect(msg).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(msg).to.match(/syntax error|invalid number|expected digit/i);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let body;",
+                  "",
+                  "// 1️⃣ Response is valid JSON",
+                  "pm.test(\"Response is valid JSON\", () => {",
+                  "  pm.response.to.be.json;",
+                  "  body = pm.response.json();",
+                  "});",
+                  "",
+                  "// 2️⃣ HTTP status is 400 (client error)",
+                  "pm.test(\"HTTP status is 400\", () => {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "});",
+                  "",
+                  "// 3️⃣ GraphQL errors array exists and is non-empty",
+                  "pm.test(\"GraphQL errors array exists\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 4️⃣ Error message indicates parse / syntax issue",
+                  "pm.test(\"Error message indicates syntax error\", () => {",
+                  "  const err = body.errors[0];",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message.toLowerCase()).to.match(/syntax error|parse error/);",
+                  "});",
+                  "",
+                  "// 5️⃣ Error includes line and column information",
+                  "pm.test(\"Error includes line and column numbers\", () => {",
+                  "  const loc = body.errors[0].locations[0];",
+                  "  pm.expect(loc).to.have.property(\"line\").that.is.a(\"number\");",
+                  "  pm.expect(loc).to.have.property(\"column\").that.is.a(\"number\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Negative test: invalid alpha drone id (id must be numeric)",
+                  "",
+                  "// 1. Status code is 400",
+                  "pm.test(\"Status code is 400\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2. GraphQL returns errors array",
+                  "pm.test(\"GraphQL returns errors array\", () => {",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3. No data is returned for invalid input",
+                  "pm.test(\"No data is returned for invalid input\", () => {",
+                  "  pm.expect(body.data).to.be.oneOf([null, undefined]);",
+                  "});",
+                  "",
+                  "// 4. Error message indicates invalid Int value",
+                  "pm.test(\"Error message indicates invalid Int value\", () => {",
+                  "  pm.expect(body.errors[0].message)",
+                  "    .to.match(/Int cannot represent non-integer value/i);",
+                  "});",
+                  "",
+                  "// 5. Error message references the invalid id",
+                  "pm.test(\"Error message references the invalid id\", () => {",
+                  "  pm.expect(body.errors[0].message).to.include(\"abcd\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_Csuite}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pilot",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse response once",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// 1) Status code is 200 (request handled, even though not allowed)",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2) GraphQL response has data and droneDisplayNameSet object",
+                  "pm.test(\"Response has data.droneDisplayNameSet\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"data\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 3) Unauthorized action is represented by errorID = 'action_not_allowed'",
+                  "pm.test(\"errorID indicates action is not allowed\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorID\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorID).to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 4) errorMessage matches expected message",
+                  "pm.test(\"errorMessage explains lack of access\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorMessage\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorMessage).to.eql(",
+                  "        \"You do not have access to execute this action.\"",
+                  "    );",
+                  "});",
+                  "",
+                  "// 5) No unexpected top-level GraphQL errors field",
+                  "pm.test(\"No top-level GraphQL errors array\", function () {",
+                  "    pm.expect(jsonData).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "// 1️⃣ Invalid request rejected (client error)",
+                  "pm.test(\"1. Returns HTTP 400\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  " //2️⃣ Response is valid JSON object",
+                  "pm.test(\"2. Response JSON is an object\", () => {",
+                  "  pm.expect(body).to.be.an(\"object\");",
+                  "});",
+                  "",
+                  "//3️⃣ GraphQL error contract: errors array exists and is non-empty",
+                  "pm.test(\"3. GraphQL errors array is present\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "//4️⃣ No success payload leaks through",
+                  "pm.test(\"4. No data returned\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Error meaning matches the failure class (syntax/invalid number)",
+                  "pm.test(\"5. Error indicates invalid numeric literal\", () => {",
+                  "  const msg = body.errors[0].message;",
+                  "  pm.expect(msg).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(msg).to.match(/syntax error|invalid number|expected digit/i);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let body;",
+                  "",
+                  "// 1️⃣ Response is valid JSON",
+                  "pm.test(\"Response is valid JSON\", () => {",
+                  "  pm.response.to.be.json;",
+                  "  body = pm.response.json();",
+                  "});",
+                  "",
+                  "// 2️⃣ HTTP status is 400 (client error)",
+                  "pm.test(\"HTTP status is 400\", () => {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "});",
+                  "",
+                  "// 3️⃣ GraphQL errors array exists and is non-empty",
+                  "pm.test(\"GraphQL errors array exists\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 4️⃣ Error message indicates parse / syntax issue",
+                  "pm.test(\"Error message indicates syntax error\", () => {",
+                  "  const err = body.errors[0];",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message.toLowerCase()).to.match(/syntax error|parse error/);",
+                  "});",
+                  "",
+                  "// 5️⃣ Error includes line and column information",
+                  "pm.test(\"Error includes line and column numbers\", () => {",
+                  "  const loc = body.errors[0].locations[0];",
+                  "  pm.expect(loc).to.have.property(\"line\").that.is.a(\"number\");",
+                  "  pm.expect(loc).to.have.property(\"column\").that.is.a(\"number\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Negative test: invalid alpha drone id (id must be numeric)",
+                  "",
+                  "// 1. Status code is 400",
+                  "pm.test(\"Status code is 400\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2. GraphQL returns errors array",
+                  "pm.test(\"GraphQL returns errors array\", () => {",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3. No data is returned for invalid input",
+                  "pm.test(\"No data is returned for invalid input\", () => {",
+                  "  pm.expect(body.data).to.be.oneOf([null, undefined]);",
+                  "});",
+                  "",
+                  "// 4. Error message indicates invalid Int value",
+                  "pm.test(\"Error message indicates invalid Int value\", () => {",
+                  "  pm.expect(body.errors[0].message)",
+                  "    .to.match(/Int cannot represent non-integer value/i);",
+                  "});",
+                  "",
+                  "// 5. Error message references the invalid id",
+                  "pm.test(\"Error message references the invalid id\", () => {",
+                  "  pm.expect(body.errors[0].message).to.include(\"abcd\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_Pilot}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Spectator",
+      "item": [
+        {
+          "name": "Change of drone name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse response once",
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "// 1) Status code is 200 (request handled, even though not allowed)",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2) GraphQL response has data and droneDisplayNameSet object",
+                  "pm.test(\"Response has data.droneDisplayNameSet\", function () {",
+                  "    pm.expect(jsonData).to.have.property(\"data\");",
+                  "    pm.expect(jsonData.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 3) Unauthorized action is represented by errorID = 'action_not_allowed'",
+                  "pm.test(\"errorID indicates action is not allowed\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorID\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorID).to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 4) errorMessage matches expected message",
+                  "pm.test(\"errorMessage explains lack of access\", function () {",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet).to.have.property(\"errorMessage\");",
+                  "    pm.expect(jsonData.data.droneDisplayNameSet.errorMessage).to.eql(",
+                  "        \"You do not have access to execute this action.\"",
+                  "    );",
+                  "});",
+                  "",
+                  "// 5) No unexpected top-level GraphQL errors field",
+                  "pm.test(\"No top-level GraphQL errors array\", function () {",
+                  "    pm.expect(jsonData).to.not.have.property(\"errors\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alph Neumaric drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();",
+                  "",
+                  "/**",
+                  " * 1️⃣ Invalid request rejected (client error)",
+                  " */",
+                  "pm.test(\"1. Returns HTTP 400\", () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "",
+                  "/**",
+                  " * 2️⃣ Response is valid JSON object",
+                  " */",
+                  "pm.test(\"2. Response JSON is an object\", () => {",
+                  "  pm.expect(body).to.be.an(\"object\");",
+                  "});",
+                  "",
+                  "/**",
+                  " * 3️⃣ GraphQL error contract: errors array exists and is non-empty",
+                  " */",
+                  "pm.test(\"3. GraphQL errors array is present\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "/**",
+                  " * 4️⃣ No success payload leaks through",
+                  " */",
+                  "pm.test(\"4. No data returned\", () => {",
+                  "  pm.expect(body).to.not.have.property(\"data\");",
+                  "});",
+                  "",
+                  "/**",
+                  " * 5️⃣ Error meaning matches the failure class (syntax/invalid number)",
+                  " */",
+                  "pm.test(\"5. Error indicates invalid numeric literal\", () => {",
+                  "  const msg = body.errors[0].message;",
+                  "  pm.expect(msg).to.be.a(\"string\").and.not.empty;",
+                  "  pm.expect(msg).to.match(/syntax error|invalid number|expected digit/i);",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 7F6, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get drone display name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Parse once",
+                  "const json = pm.response.json();",
+                  "const list = json?.data?.droneDisplayNames;",
+                  "",
+                  "// 1️⃣ HTTP transport succeeded",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 2️⃣ GraphQL executed successfully (no resolver/runtime errors)",
+                  "pm.test(\"2. No top-level GraphQL errors\", () => {",
+                  "  pm.expect(json).to.not.have.property(\"errors\");",
+                  "});",
+                  "",
+                  "// 3️⃣ droneDisplayNames exists and is an array",
+                  "pm.test(\"3. data.droneDisplayNames is an array\", () => {",
+                  "  pm.expect(json).to.have.nested.property(\"data.droneDisplayNames\");",
+                  "  pm.expect(list).to.be.an(\"array\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Every drone has a valid, non-empty name (primary identifier)",
+                  "pm.test(\"4. Every drone has a non-empty name\", () => {",
+                  "  pm.expect(list.length).to.be.greaterThan(0);",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`).to.be.an(\"object\");",
+                  "    pm.expect(item.name, `name at index ${idx}`)",
+                  "      .to.be.a(\"string\")",
+                  "      .and.not.empty;",
+                  "  });",
+                  "});",
+                  "",
+                  "// 5️⃣ displayName exists and is a string (empty allowed)",
+                  "pm.test(\"5. displayName exists and is a string (empty allowed)\", () => {",
+                  "  list.forEach((item, idx) => {",
+                  "    pm.expect(item, `item at index ${idx}`)",
+                  "      .to.have.property(\"displayName\");",
+                  "    pm.expect(item.displayName, `displayName at index ${idx}`)",
+                  "      .to.be.a(\"string\");",
+                  "  });",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query DroneDisplayNames {\n    droneDisplayNames {\n        name\n        displayName\n    }\n}\n",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Null drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let body;",
+                  "",
+                  "// 1️⃣ Response is valid JSON",
+                  "pm.test(\"Response is valid JSON\", () => {",
+                  "  pm.response.to.be.json;",
+                  "  body = pm.response.json();",
+                  "});",
+                  "",
+                  "// 2️⃣ HTTP status is 400 (client error)",
+                  "pm.test(\"HTTP status is 400\", () => {",
+                  "  pm.expect(pm.response.code).to.equal(400);",
+                  "});",
+                  "",
+                  "// 3️⃣ GraphQL errors array exists and is non-empty",
+                  "pm.test(\"GraphQL errors array exists\", () => {",
+                  "  pm.expect(body).to.have.property(\"errors\");",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 4️⃣ Error message indicates parse / syntax issue",
+                  "pm.test(\"Error message indicates syntax error\", () => {",
+                  "  const err = body.errors[0];",
+                  "  pm.expect(err).to.have.property(\"message\");",
+                  "  pm.expect(err.message.toLowerCase()).to.match(/syntax error|parse error/);",
+                  "});",
+                  "",
+                  "// 5️⃣ Error includes line and column information",
+                  "pm.test(\"Error includes line and column numbers\", () => {",
+                  "  const loc = body.errors[0].locations[0];",
+                  "  pm.expect(loc).to.have.property(\"line\").that.is.a(\"number\");",
+                  "  pm.expect(loc).to.have.property(\"column\").that.is.a(\"number\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:  , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "char drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Negative test: invalid alpha drone id (id must be numeric)",
+                  "",
+                  "// 1. Status code is 400",
+                  "pm.test(\"Status code is 400\", () => {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2. GraphQL returns errors array",
+                  "pm.test(\"GraphQL returns errors array\", () => {",
+                  "  pm.expect(body.errors).to.be.an(\"array\").that.is.not.empty;",
+                  "});",
+                  "",
+                  "// 3. No data is returned for invalid input",
+                  "pm.test(\"No data is returned for invalid input\", () => {",
+                  "  pm.expect(body.data).to.be.oneOf([null, undefined]);",
+                  "});",
+                  "",
+                  "// 4. Error message indicates invalid Int value",
+                  "pm.test(\"Error message indicates invalid Int value\", () => {",
+                  "  pm.expect(body.errors[0].message)",
+                  "    .to.match(/Int cannot represent non-integer value/i);",
+                  "});",
+                  "",
+                  "// 5. Error message references the invalid id",
+                  "pm.test(\"Error message references the invalid id\", () => {",
+                  "  pm.expect(body.errors[0].message).to.include(\"abcd\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id:abcd , displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "set name with special characters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"@@@@@\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "invalid drone id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 9999, displayName: \"Postman test1\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "EmptyDisplayname",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 1️⃣ Verify HTTP request succeeded at transport level (GraphQL standard)",
+                  "pm.test(\"1. HTTP status is 200\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response once",
+                  "const body = pm.response.json();",
+                  "",
+                  "// 2️⃣ Ensure GraphQL returned a data object",
+                  "pm.test(\"2. Response contains data\", () => {",
+                  "  pm.expect(body).to.have.property(\"data\");",
+                  "});",
+                  "",
+                  "// 3️⃣ Ensure mutation response node exists (schema safety)",
+                  "pm.test(\"3. droneDisplayNameSet exists\", () => {",
+                  "  pm.expect(body.data).to.have.property(\"droneDisplayNameSet\");",
+                  "});",
+                  "",
+                  "// 4️⃣ Validate business rule: action is not allowed for this role",
+                  "pm.test(\"4. errorID is action_not_allowed\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorID)",
+                  "    .to.eql(\"action_not_allowed\");",
+                  "});",
+                  "",
+                  "// 5️⃣ Validate exact access-denied error message",
+                  "pm.test(\"5. errorMessage is exact access denied message\", () => {",
+                  "  pm.expect(body.data.droneDisplayNameSet.errorMessage)",
+                  "    .to.eql(\"You do not have access to execute this action.\");",
+                  "});",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DroneDisplayNameSet {\n    droneDisplayNameSet(id: 76, displayName: \"\") {\n        errorID\n        errorMessage\n    }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{URL}}",
+              "host": [
+                "{{URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{Token_Spectator}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
