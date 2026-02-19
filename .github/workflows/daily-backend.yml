@@ -16,22 +16,22 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Newman + reporter
+      - name: Install Newman + HTML reporter
         run: |
           npm install -g newman newman-reporter-htmlextra
 
       - name: Prepare output folder
         run: mkdir -p newman
 
-      # 1) Login: export BOTH globals + environment (so tokens/vars persist exactly like Postman runner)
-      - name: Run Login Collection (export env + globals)
+      # 1) Login: IMPORTANT - exact env-var names (case sensitive)
+      - name: Run Login Collection (export globals)
         run: |
           newman run postman/WT_Login_Token.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             --env-var "login_email_admin=${{ secrets.LOGIN_EMAIL_ADMIN }}" \
             --env-var "login_password_admin=${{ secrets.LOGIN_PASSWORD_ADMIN }}" \
-            --env-var "login_email_owner=${{ secrets.LOGIN_EMAIL_OWNER }}" \
-            --env-var "login_password_owner=${{ secrets.LOGIN_PASSWORD_OWNER }}" \
+            --env-var "login_email_Owner=${{ secrets.LOGIN_EMAIL_OWNER }}" \
+            --env-var "login_password_Owner=${{ secrets.LOGIN_PASSWORD_OWNER }}" \
             --env-var "login_email_pilot=${{ secrets.LOGIN_EMAIL_PILOT }}" \
             --env-var "login_password_pilot=${{ secrets.LOGIN_PASSWORD_PILOT }}" \
             --env-var "login_email_spectator=${{ secrets.LOGIN_EMAIL_SPECTATOR }}" \
@@ -41,23 +41,13 @@ jobs:
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            --export-globals newman/globals.json \
-            --export-environment newman/env.after-login.json
+            --export-globals newman/globals.json
 
-      # (Optional) Debug: list variable *names* only (no secrets printed)
-      - name: Debug exported variable names
-        run: |
-          node -e "const fs=require('fs'); \
-            const e=JSON.parse(fs.readFileSync('newman/env.after-login.json','utf8')); \
-            const g=JSON.parse(fs.readFileSync('newman/globals.json','utf8')); \
-            console.log('ENV VARS:', (e.values||[]).map(v=>v.key).sort().join(', ')); \
-            console.log('GLOBAL VARS:', (g.values||[]).map(v=>v.key).sort().join(', '));"
-
-      # 2) Main collection: USE the exported environment + globals
+      # 2) Main collection: use exported globals (tokens)
       - name: Run Drone Display Name Collection (HTML report)
         run: |
           newman run postman/Drone_display_name.postman_collection.json \
-            -e newman/env.after-login.json \
+            -e postman/DevEnv_CI.postman_environment.json \
             -g newman/globals.json \
             --timeout-request 30000 \
             --timeout-script 30000 \
