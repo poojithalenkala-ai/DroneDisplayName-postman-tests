@@ -1,10 +1,7 @@
-name: Daily Backend Postman Tests
+name: Backend Postman Tests (no Slack)
 
 on:
   workflow_dispatch: {}
-  schedule:
-    # 9:00 PM CST/CDT (America/Chicago) == 03:00 UTC next day
-    - cron: "0 3 * * *"
 
 jobs:
   postman:
@@ -19,14 +16,15 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Newman + HTML reporter
+      - name: Install Newman + reporter
         run: |
           npm install -g newman newman-reporter-htmlextra
 
       - name: Prepare output folder
         run: mkdir -p newman
 
-      - name: Run Login Collection (export globals)
+      # 1) Login: export BOTH globals + environment (so tokens/vars persist exactly like Postman runner)
+      - name: Run Login Collection (export env + globals)
         run: |
           newman run postman/WT_Login_Token.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
@@ -43,17 +41,28 @@ jobs:
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            --export-globals globals.json
+            --export-globals newman/globals.json \
+            --export-environment newman/env.after-login.json
 
-      - name: Run Drone Display Name Collection (use exported globals)
+      # (Optional) Debug: list variable *names* only (no secrets printed)
+      - name: Debug exported variable names
+        run: |
+          node -e "const fs=require('fs'); \
+            const e=JSON.parse(fs.readFileSync('newman/env.after-login.json','utf8')); \
+            const g=JSON.parse(fs.readFileSync('newman/globals.json','utf8')); \
+            console.log('ENV VARS:', (e.values||[]).map(v=>v.key).sort().join(', ')); \
+            console.log('GLOBAL VARS:', (g.values||[]).map(v=>v.key).sort().join(', '));"
+
+      # 2) Main collection: USE the exported environment + globals
+      - name: Run Drone Display Name Collection (HTML report)
         run: |
           newman run postman/Drone_display_name.postman_collection.json \
-            -e postman/DevEnv_CI.postman_environment.json \
-            --globals globals.json \
+            -e newman/env.after-login.json \
+            -g newman/globals.json \
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            -r htmlextra,cli \
+            -r cli,htmlextra \
             --reporter-htmlextra-export newman/report.html
 
       - name: Upload HTML report
@@ -62,3 +71,4 @@ jobs:
         with:
           name: newman-report
           path: newman/report.html
+          if-no-files-found: warn
