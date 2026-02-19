@@ -22,12 +22,6 @@ jobs:
       - name: Prepare output folder
         run: mkdir -p newman
 
-      # Safe debug: prints only keys from the environment file (no values)
-      - name: Debug: list DevEnv_CI variable keys (no secrets)
-        run: |
-          echo "---- Env keys in postman/DevEnv_CI.postman_environment.json ----"
-          node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('postman/DevEnv_CI.postman_environment.json','utf8')); console.log((e.values||[]).map(v=>v.key).sort().join('\n'));"
-
       - name: Run Login Collection (export globals)
         run: |
           newman run postman/WT_Login_Token.postman_collection.json \
