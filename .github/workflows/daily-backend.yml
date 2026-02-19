@@ -1,9 +1,10 @@
-name: Backend Postman Tests (no Slack)
+name: Backend Postman Tests
 
 on:
   workflow_dispatch: {}
-  push:
-    branches: ["main"]
+  schedule:
+    # 9:00 PM America/Chicago (CST/CDT handled automatically)
+    - cron: "0 3 * * *"
 
 jobs:
   postman:
@@ -24,10 +25,9 @@ jobs:
       - name: Prepare output folder
         run: mkdir -p newman
 
-      # 1) Login collection: exports tokens into newman/globals.json
+      # 1) Login: export globals (tokens)
       - name: Run Login Collection (export globals)
         run: |
-          set -e
           newman run postman/WT_Login_Token.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             --env-var "login_email_admin=${{ secrets.LOGIN_EMAIL_ADMIN }}" \
@@ -52,7 +52,6 @@ jobs:
       # 2) Main collection: use exported globals (tokens)
       - name: Run Drone Display Name Collection (HTML report)
         run: |
-          set -e
           newman run postman/Drone_display_name.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             -g newman/globals.json \
@@ -69,3 +68,34 @@ jobs:
           name: newman-report
           path: newman/report.html
           if-no-files-found: warn
+
+      # Slack notification (uses same webhook => same "Postman CI Bot" picture/name)
+      - name: Notify Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          STATUS: ${{ job.status }}
+          BRANCH: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          WORKFLOW_NAME: ${{ github.workflow }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping Slack notification."
+            exit 0
+          fi
+
+          if [ "$STATUS" = "success" ]; then
+            STATUS_TEXT="success"
+          else
+            STATUS_TEXT="failure"
+          fi
+
+          payload=$(cat <<EOF
+          {
+            "text": "🚀 Daily Postman Tests Completed\n\nStatus: ${STATUS_TEXT}\nBranch: ${BRANCH}\nRun: ${RUN_NUMBER}\nURL: ${RUN_URL}"
+          }
+          EOF
+          )
+
+          curl -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL"
