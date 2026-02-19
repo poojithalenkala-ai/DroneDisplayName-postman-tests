@@ -1,9 +1,73 @@
-      - name: Debug: list environment variable keys (no secrets)
+name: Backend Postman Tests (no Slack)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  postman:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Newman + HTML reporter
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Prepare output folder
+        run: mkdir -p newman
+
+      # ✅ Safe debug: prints ONLY keys from DevEnv_CI (no secret values)
+      - name: Debug: list DevEnv_CI variable keys (no secrets)
         run: |
-          echo "---- Env keys in DevEnv_CI ----"
-          node -e "
-            const fs=require('fs');
-            const e=JSON.parse(fs.readFileSync('postman/DevEnv_CI.postman_environment.json','utf8'));
-            const vals=(e.values||[]).map(v=>v.key).sort();
-            console.log(vals.join('\n'));
-          "
+          echo "---- Env keys in postman/DevEnv_CI.postman_environment.json ----"
+          node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('postman/DevEnv_CI.postman_environment.json','utf8')); console.log((e.values||[]).map(v=>v.key).sort().join('\n'));"
+
+      # 1) Login collection: export globals (tokens)
+      - name: Run Login Collection (export globals)
+        run: |
+          newman run postman/WT_Login_Token.postman_collection.json \
+            -e postman/DevEnv_CI.postman_environment.json \
+            --env-var "login_email_admin=${{ secrets.LOGIN_EMAIL_ADMIN }}" \
+            --env-var "login_password_admin=${{ secrets.LOGIN_PASSWORD_ADMIN }}" \
+            --env-var "login_email_owner=${{ secrets.LOGIN_EMAIL_OWNER }}" \
+            --env-var "login_password_owner=${{ secrets.LOGIN_PASSWORD_OWNER }}" \
+            --env-var "login_email_pilot=${{ secrets.LOGIN_EMAIL_PILOT }}" \
+            --env-var "login_password_pilot=${{ secrets.LOGIN_PASSWORD_PILOT }}" \
+            --env-var "login_email_spectator=${{ secrets.LOGIN_EMAIL_SPECTATOR }}" \
+            --env-var "login_password_spectator=${{ secrets.LOGIN_PASSWORD_SPECTATOR }}" \
+            --env-var "login_email_superadmin=${{ secrets.LOGIN_EMAIL_SUPERADMIN }}" \
+            --env-var "login_password_superadmin=${{ secrets.LOGIN_PASSWORD_SUPERADMIN }}" \
+            --env-var "login_email_executiveadmin=${{ secrets.LOGIN_EMAIL_EXECUTIVEADMIN }}" \
+            --env-var "login_password_executiveadmin=${{ secrets.LOGIN_PASSWORD_EXECUTIVEADMIN }}" \
+            --env-var "login_email_csuite=${{ secrets.LOGIN_EMAIL_CSUITE }}" \
+            --env-var "login_password_csuite=${{ secrets.LOGIN_PASSWORD_CSUITE }}" \
+            --timeout-request 30000 \
+            --timeout-script 30000 \
+            --delay-request 200 \
+            --export-globals newman/globals.json
+
+      # 2) Main collection: use exported globals (tokens)
+      - name: Run Drone Display Name Collection (HTML report)
+        run: |
+          newman run postman/Drone_display_name.postman_collection.json \
+            -e postman/DevEnv_CI.postman_environment.json \
+            -g newman/globals.json \
+            --timeout-request 30000 \
+            --timeout-script 30000 \
+            --delay-request 200 \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export newman/report.html
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman/report.html
+          if-no-files-found: warn
