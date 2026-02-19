@@ -38,8 +38,6 @@ jobs:
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            --retries 2 \
-            --retry-on-network-failure \
             --export-globals globals.json
 
       - name: Run Drone Display Name Collection
@@ -51,8 +49,6 @@ jobs:
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            --retries 2 \
-            --retry-on-network-failure \
             --reporters cli,htmlextra \
             --reporter-htmlextra-export newman/report.html
 
@@ -65,7 +61,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      - name: Notify Slack
+      - name: Notify Slack (old-style format)
         if: always()
         uses: slackapi/slack-github-action@v2.1.1
         with:
@@ -73,5 +69,5 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": "*Daily Backend Postman Tests* — `${{ job.status }}`\nRepo: `${{ github.repository }}`\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              "text": ":rocket: *Daily Backend Postman Tests Completed*\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Run:* ${{ github.run_number }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }
