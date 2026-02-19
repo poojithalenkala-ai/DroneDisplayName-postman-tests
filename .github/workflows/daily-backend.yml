@@ -2,7 +2,7 @@ name: Daily Backend Postman Tests
 
 on:
   schedule:
-      - cron: "0 3 * * *"   # 9:00 PM CST (03:00 UTC)
+    - cron: "0 3 * * *" # 9:00 PM CST (03:00 UTC)
   workflow_dispatch:
 
 jobs:
@@ -62,16 +62,16 @@ jobs:
         with:
           name: newman-report
           path: newman/report.html
+          if-no-files-found: warn
           retention-days: 7
 
       - name: Notify Slack
         if: always()
-        uses: slackapi/slack-github-action@v2
+        uses: slackapi/slack-github-action@v2.1.1
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
-              "text": "*Daily Backend Tests* — `${{ job.status }}`\nRepo: `${{ github.repository }}`\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              "text": "*Daily Backend Postman Tests* — `${{ job.status }}`\nRepo: `${{ github.repository }}`\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
