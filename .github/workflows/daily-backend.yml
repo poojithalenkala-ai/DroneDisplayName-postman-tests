@@ -1,7 +1,9 @@
 name: Backend Postman Tests (no Slack)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+  push:
+    branches: [ "main" ]
 
 jobs:
   postman:
@@ -22,8 +24,10 @@ jobs:
       - name: Prepare output folder
         run: mkdir -p newman
 
+      # 1) Login: exports tokens into newman/globals.json
       - name: Run Login Collection (export globals)
         run: |
+          set -e
           newman run postman/WT_Login_Token.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             --env-var "login_email_admin=${{ secrets.LOGIN_EMAIL_ADMIN }}" \
@@ -45,8 +49,10 @@ jobs:
             --delay-request 200 \
             --export-globals newman/globals.json
 
+      # 2) Main collection: uses exported globals (tokens)
       - name: Run Drone Display Name Collection (HTML report)
         run: |
+          set -e
           newman run postman/Drone_display_name.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             -g newman/globals.json \
