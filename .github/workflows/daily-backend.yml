@@ -19,7 +19,7 @@ jobs:
           node-version: "20"
 
       - name: Install Newman
-        run: npm install -g newman newman-reporter-htmlextra
+        run: npm install -g newman@latest newman-reporter-htmlextra
 
       - name: Run Login Collection (export globals)
         run: |
@@ -61,7 +61,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      - name: Notify Slack (old-style format)
+      - name: Notify Slack (like old style)
         if: always()
         uses: slackapi/slack-github-action@v2.1.1
         with:
@@ -69,5 +69,5 @@ jobs:
           webhook-type: incoming-webhook
           payload: |
             {
-              "text": ":rocket: *Daily Backend Postman Tests Completed*\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Run:* ${{ github.run_number }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              "text": ":rocket: *Daily Postman Tests Completed*\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Run:* ${{ github.run_number }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }
