@@ -18,12 +18,11 @@ jobs:
 
       - name: Install Newman + HTML reporter
         run: |
-          npm install -g newman newman-reporter-htmlextra
+          npm install -g newman@latest newman-reporter-htmlextra@latest
 
       - name: Prepare output folder
         run: mkdir -p newman
 
-      # 1) Login: IMPORTANT - exact env-var names (case sensitive)
       - name: Run Login Collection (export globals)
         run: |
           newman run postman/WT_Login_Token.postman_collection.json \
@@ -43,7 +42,6 @@ jobs:
             --delay-request 200 \
             --export-globals newman/globals.json
 
-      # 2) Main collection: use exported globals (tokens)
       - name: Run Drone Display Name Collection (HTML report)
         run: |
           newman run postman/Drone_display_name.postman_collection.json \
