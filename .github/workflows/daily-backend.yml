@@ -1,9 +1,10 @@
 name: Daily Backend Postman Tests
 
 on:
+  workflow_dispatch: {}
   schedule:
-    - cron: "0 3 * * *" # 9:00 PM CST (03:00 UTC)
-  workflow_dispatch:
+    # 9:00 PM CST/CDT (America/Chicago) == 03:00 UTC next day
+    - cron: "0 3 * * *"
 
 jobs:
   postman:
@@ -18,8 +19,12 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Newman
-        run: npm install -g newman@latest newman-reporter-htmlextra
+      - name: Install Newman + HTML reporter
+        run: |
+          npm install -g newman newman-reporter-htmlextra
+
+      - name: Prepare output folder
+        run: mkdir -p newman
 
       - name: Run Login Collection (export globals)
         run: |
@@ -40,16 +45,15 @@ jobs:
             --delay-request 200 \
             --export-globals globals.json
 
-      - name: Run Drone Display Name Collection
+      - name: Run Drone Display Name Collection (use exported globals)
         run: |
-          mkdir -p newman
           newman run postman/Drone_display_name.postman_collection.json \
             -e postman/DevEnv_CI.postman_environment.json \
             --globals globals.json \
             --timeout-request 30000 \
             --timeout-script 30000 \
             --delay-request 200 \
-            --reporters cli,htmlextra \
+            -r htmlextra,cli \
             --reporter-htmlextra-export newman/report.html
 
       - name: Upload HTML report
@@ -58,16 +62,3 @@ jobs:
         with:
           name: newman-report
           path: newman/report.html
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Notify Slack (like old style)
-        if: always()
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "text": ":rocket: *Daily Postman Tests Completed*\n*Status:* ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*Run:* ${{ github.run_number }}\n*URL:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
