@@ -1,7 +1,7 @@
 name: Backend Postman Tests (no Slack)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   postman:
@@ -22,13 +22,12 @@ jobs:
       - name: Prepare output folder
         run: mkdir -p newman
 
-      # ✅ Safe debug: prints ONLY keys from DevEnv_CI (no secret values)
+      # Safe debug: prints only keys from the environment file (no values)
       - name: Debug: list DevEnv_CI variable keys (no secrets)
         run: |
           echo "---- Env keys in postman/DevEnv_CI.postman_environment.json ----"
           node -e "const fs=require('fs'); const e=JSON.parse(fs.readFileSync('postman/DevEnv_CI.postman_environment.json','utf8')); console.log((e.values||[]).map(v=>v.key).sort().join('\n'));"
 
-      # 1) Login collection: export globals (tokens)
       - name: Run Login Collection (export globals)
         run: |
           newman run postman/WT_Login_Token.postman_collection.json \
@@ -52,7 +51,6 @@ jobs:
             --delay-request 200 \
             --export-globals newman/globals.json
 
-      # 2) Main collection: use exported globals (tokens)
       - name: Run Drone Display Name Collection (HTML report)
         run: |
           newman run postman/Drone_display_name.postman_collection.json \
